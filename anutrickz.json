@@ -1,5 +1,5 @@
 {
-  "name": "Anutrickz - blogger template 2020 - seo for blogger - loot offer",
+  "name": "Anutrickz",
   "short_name": "Anutrickz",
   "start_url": "https://anutrickz.blogspot.com/",
   "display": "standalone",
@@ -9,17 +9,17 @@
   "icons": [{
     "src": "https://cdn.statically.io/img/picresize.com/images/rsz_picsart_09-30-044348.jpg",
     "sizes": "36x36",
-    "type": "image/png",
+    "type": "image/jpg",
     "density": "0.75"
   }, {
     "src": "https://picresize.com/images/rsz_1picsart_09-30-044348.jpg",
     "sizes": "48x48",
-    "type": "image/png",
+    "type": "image/jpg",
     "density": "1.0"
   }, {
     "src": "https://picresize.com/images/rsz_2picsart_09-30-044348.jpg",
     "sizes": "72x72",
-    "type": "image/png",
+    "type": "image/jpg",
     "density": "1.5"
   }, {
     "src": "Url Icon favicon size 96x96",
@@ -29,17 +29,17 @@
   }, {
     "src": "https://picresize.com/images/rsz_3picsart_09-30-044348.jpg",
     "sizes": "144x144",
-    "type": "image/png",
+    "type": "image/jpg",
     "density": "3.0"
   }, {
     "src": "Url Icon favicon size 192x192",
     "sizes": "192x192",
-    "type": "image/png",
+    "type": "image/jpg",
     "density": "4.0"
   }, {
     "src": "https://cdn.statically.io/img/1.bp.blogspot.com/-xvZX8Rt87gA/XfR4ZmiYfGI/AAAAAAAACfk/WnPRzU8oiJk-0paprnrCox8_N91ggVQ9wCKgBGAsYHg/s1600/PicsArt_09-30-04.43.48.jpg",
     "sizes": "512x512",
-    "type": "image/png",
+    "type": "image/jpg",
     "density": "5.0"
   }]
 }
