@@ -3,7 +3,7 @@
   "short_name": "AT",
   "lang": "en-US",
   "dir": "ltr",
-  "start_url": "https://anutrickz.blogspot.com",
+  "start_url": ".",
   "display": "standalone",
   "orientation": "portrait-primary",
    "background_color": "#3D3858",
@@ -44,8 +44,5 @@
     "sizes": "512x512",
     "type": "image/png",
     "density": "5.0"
-  }],
-"serviceworker": {
-    "src": "https://raw.githubusercontent.com/anupamxxx/anutrickzv1/master/serviceWorker.js"
-  }
+  }]
 }
