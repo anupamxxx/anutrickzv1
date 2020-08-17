@@ -4,7 +4,7 @@ const assets = [
   "/",
   "https://anutrickz.blogspot.com",
   "",
-  "https://raw.githubusercontent.com/anupamxxx/anutrickzv1/master/anutrickz.json",
+  "https://raw.githubusercontent.com/anupamxxx/anutrickzv1/master/manifest.json",
   "/images/coffee1.jpg",
   "/images/coffee2.jpg",
   "/images/coffee3.jpg",
