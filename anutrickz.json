@@ -3,7 +3,7 @@
   "short_name": "AT",
   "lang": "en-US",
   "dir": "ltr",
-  "start_url": "/",
+  "start_url": "https://anutrickz.blogspot.com",
   "display": "standalone",
   "orientation": "portrait-primary",
    "background_color": "#3D3858",
@@ -46,6 +46,6 @@
     "density": "5.0"
   }],
 "serviceworker": {
-    "src": "./sw.js"
+    "src": "https://raw.githubusercontent.com/anupamxxx/anutrickzv1/master/sw.js"
   }
 }
