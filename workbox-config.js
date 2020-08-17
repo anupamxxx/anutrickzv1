@@ -3,7 +3,7 @@ module.exports = {
   globPatterns: [
     '**/*.{html,json,js,css,woff}'
   ],
-  swDest: './sw.js',
+  swDest: 'https://raw.githubusercontent.com/anupamxxx/anutrickzv1/master/anutrickz.json',
   runtimeCaching: [{
     urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
     handler: 'NetworkFirst',
