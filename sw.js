@@ -1,310 +1,102 @@
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
+if (workbox) {
+workbox.core.skipWaiting();
+workbox.core.clientsClaim();
+workbox.core.setCacheNameDetails({
+  prefix: 'thn-sw',
+  suffix: 'v19',
+  precache: 'install-time',
+  runtime: 'run-time'
+});
 
-const CACHE_VERSION = 1;
+const FALLBACK_HTML_URL = '/offline.html';
+const version = workbox.core.cacheNames.suffix;
+workbox.precaching.precacheAndRoute([{url: FALLBACK_HTML_URL, revision: null},{url: '/manifest.json', revision: null},{url: '/favicon.ico', revision: null},{url: '/css/roboto.css', revision: null}]);
 
-const BASE_CACHE_FILES = [
-    '/manifest.json',
-    '/css/bootstrap.min.css',
-    '/css/style.css',
-    '/js/jquery-3.2.1.slim.min.js',
-    '/js/popper.min.js',
-    '/js/bootstrap.min.js',
-    '/img/logo.png',
-    '/img/favicon.png',
-];
+workbox.routing.setDefaultHandler(new workbox.strategies.NetworkOnly());
 
-const OFFLINE_CACHE_FILES = [
-    '/css/bootstrap.min.css',
-    '/css/style.css',
-    '/js/jquery-3.2.1.slim.min.js',
-    '/js/popper.min.js',
-    '/js/bootstrap.min.js',
-    '/img/logo.png',
-    '/img/favicon.png',
-];
-
-const NOT_FOUND_CACHE_FILES = [
-    
-    '/404.html',
-];
-
-const OFFLINE_PAGE = '/offline/index.html';
-const NOT_FOUND_PAGE = '/404.html';
-
-const CACHE_VERSIONS = {
-    assets: 'assets-v' + CACHE_VERSION,
-    content: 'content-v' + CACHE_VERSION,
-    offline: 'offline-v' + CACHE_VERSION,
-    notFound: '404-v' + CACHE_VERSION,
-};
-
-const MAX_TTL = {
-    '/': 3600,
-    html: 3600,
-    json: 86400,
-    js: 86400,
-    css: 86400,
-};
-
-const SUPPORTED_METHODS = [
-    'GET',
-];
-
-function isBlacklisted(url) {
-    return (CACHE_BLACKLIST.length > 0) ? !CACHE_BLACKLIST.filter((rule) => {
-        if(typeof rule === 'function') {
-            return !rule(url);
-        } else {
-            return false;
-        }
-    }).length : false
-}
-
-function getFileExtension(url) {
-    let extension = url.split('.').reverse()[0].split('?')[0];
-    return (extension.endsWith('/')) ? '/' : extension;
-}
-
-function getTTL(url) {
-    if (typeof url === 'string') {
-        let extension = getFileExtension(url);
-        if (typeof MAX_TTL[extension] === 'number') {
-            return MAX_TTL[extension];
-        } else {
-            return null;
-        }
-    } else {
-        return null;
-    }
-}
-
-function installServiceWorker() {
-    return Promise.all(
-        [
-            caches.open(CACHE_VERSIONS.assets)
-                .then(
-                    (cache) => {
-                        return cache.addAll(BASE_CACHE_FILES);
-                    }
-                ),
-            caches.open(CACHE_VERSIONS.offline)
-                .then(
-                    (cache) => {
-                        return cache.addAll(OFFLINE_CACHE_FILES);
-                    }
-                ),
-            caches.open(CACHE_VERSIONS.notFound)
-                .then(
-                    (cache) => {
-                        return cache.addAll(NOT_FOUND_CACHE_FILES);
-                    }
-                )
-        ]
-    );
-}
-
-function cleanupLegacyCache() {
-
-    let currentCaches = Object.keys(CACHE_VERSIONS)
-        .map(
-            (key) => {
-                return CACHE_VERSIONS[key];
-            }
-        );
-
-    return new Promise(
-        (resolve, reject) => {
-
-            caches.keys()
-                .then(
-                    (keys) => {
-                        return legacyKeys = keys.filter(
-                            (key) => {
-                                return !~currentCaches.indexOf(key);
-                            }
-                        );
-                    }
-                )
-                .then(
-                    (legacy) => {
-                        if (legacy.length) {
-                            Promise.all(
-                                legacy.map(
-                                    (legacyKey) => {
-                                        return caches.delete(legacyKey)
-                                    }
-                                )
-                            )
-                                .then(
-                                    () => {
-                                        resolve()
-                                    }
-                                )
-                                .catch(
-                                    (err) => {
-                                        reject(err);
-                                    }
-                                );
-                        } else {
-                            resolve();
-                        }
-                    }
-                )
-                .catch(
-                    () => {
-                        reject();
-                    }
-                );
-
-        }
-    );
-}
-
-
-self.addEventListener(
-    'install', event => {
-        event.waitUntil(installServiceWorker());
-    }
+workbox.routing.registerRoute(
+    new RegExp('https://fonts.(?:googleapis|gstatic).com/(.*)'),
+    new workbox.strategies.CacheFirst({
+        cacheName: 'google-fonts-live-' + version,
+        plugins: [
+            new workbox.expiration.ExpirationPlugin({
+                maxAgeSeconds: 365 * 24 * 60 * 60,
+                maxEntries:30,
+                purgeOnQuotaError: true
+            }),
+            new workbox.cacheableResponse.CacheableResponsePlugin({
+            statuses: [0, 200],
+            })
+        ],
+    }),'GET'
 );
 
-// The activate handler takes care of cleaning up old caches.
-self.addEventListener(
-    'activate', event => {
-        event.waitUntil(
-            Promise.all(
-                [
-                    cleanupLegacyCache(),
-                ]
-            )
-                .catch(
-                    (err) => {
-                        event.skipWaiting();
-                    }
-                )
-        );
-    }
+workbox.routing.registerRoute(
+    new RegExp('https://thehackernews.com/fonts/(.*)'),
+    new workbox.strategies.CacheFirst({
+        cacheName: 'google-fonts-hosted-' + version,
+        plugins: [
+            new workbox.expiration.ExpirationPlugin({
+                maxAgeSeconds: 365 * 24 * 60 * 60,
+                maxEntries:30,
+                purgeOnQuotaError: true
+            })
+        ],
+    }),'GET'
 );
 
-self.addEventListener(
-    'fetch', event => {
-
-        event.respondWith(
-            caches.open(CACHE_VERSIONS.content)
-                .then(
-                    (cache) => {
-
-                        return cache.match(event.request)
-                            .then(
-                                (response) => {
-
-                                    if (response) {
-
-                                        let headers = response.headers.entries();
-                                        let date = null;
-
-                                        for (let pair of headers) {
-                                            if (pair[0] === 'date') {
-                                                date = new Date(pair[1]);
-                                            }
-                                        }
-
-                                        if (date) {
-                                            let age = parseInt((new Date().getTime() - date.getTime()) / 1000);
-                                            let ttl = getTTL(event.request.url);
-
-                                            if (ttl && age > ttl) {
-
-                                                return new Promise(
-                                                    (resolve) => {
-
-                                                        return fetch(event.request)
-                                                            .then(
-                                                                (updatedResponse) => {
-                                                                    if (updatedResponse) {
-                                                                        cache.put(event.request, updatedResponse.clone());
-                                                                        resolve(updatedResponse);
-                                                                    } else {
-                                                                        resolve(response)
-                                                                    }
-                                                                }
-                                                            )
-                                                            .catch(
-                                                                () => {
-                                                                    resolve(response);
-                                                                }
-                                                            );
-
-                                                    }
-                                                )
-                                                    .catch(
-                                                        (err) => {
-                                                            return response;
-                                                        }
-                                                    );
-                                            } else {
-                                                return response;
-                                            }
-
-                                        } else {
-                                            return response;
-                                        }
-
-                                    } else {
-                                        return null;
-                                    }
-                                }
-                            )
-                            .then(
-                                (response) => {
-                                    if (response) {
-                                        return response;
-                                    } else {
-                                        return fetch(event.request) 
-                                            .then(
-                                                (response) => {
-
-                                                    if(response.status < 400) {
-                                                        if (~SUPPORTED_METHODS.indexOf(event.request.method) && !isBlacklisted(event.request.url)) {
-                                                            cache.put(event.request, response.clone());
-                                                        }
-                                                        return response;
-                                                    } 
-                                                    else {
-                                                        return caches.open(CACHE_VERSIONS.notFound).then((cache) => {
-                                                            return cache.match(NOT_FOUND_PAGE);
-                                                        })
-                                                    }
-                                                }
-                                            )
-                                            .then((response) => {
-                                                if(response) {
-                                                    return response;
-                                                }
-                                            })
-                                            .catch(
-                                                () => {
-
-                                                    return caches.open(CACHE_VERSIONS.offline)
-                                                        .then(
-                                                            (offlineCache) => {
-                                                                return offlineCache.match(OFFLINE_PAGE)
-                                                            }
-                                                        )
-
-                                                }
-                                            )
-                                        
-                                    }
-                                }
-                            )
-                            .catch(
-                                (error) => {
-                                    console.error('  Error in fetch handler:', error);
-                                    throw error;
-                                }
-                            );
-                    }
-                )
-        );
-
-    }
+workbox.routing.registerRoute(
+    new RegExp('https://(?:ajax.cloudflare|www.google-analytics|cdnjs.cloudflare).com/(.*)'),
+    new workbox.strategies.StaleWhileRevalidate({
+        cacheName: 'third-party-files-' + version,
+        plugins: [
+            new workbox.expiration.ExpirationPlugin({
+                maxAgeSeconds: 15 * 24 * 60 * 60,
+                maxEntries:100,
+                purgeOnQuotaError: true
+            }),
+            new workbox.cacheableResponse.CacheableResponsePlugin({
+            statuses: [0, 200],
+            })
+        ],
+    }),'GET'
 );
+
+workbox.routing.registerRoute(
+    new RegExp('.(?:css|png|gif|jpg|svg|woff|woff2|ico)$'),
+    new workbox.strategies.CacheFirst({
+        cacheName: 'images-js-css-' + version,
+        plugins: [
+            new workbox.expiration.ExpirationPlugin({
+                maxAgeSeconds: 60 * 24 * 60 * 60,
+                maxEntries:200,
+                purgeOnQuotaError: true
+            })
+        ],
+    }),'GET'
+);
+
+workbox.routing.setCatchHandler(({event}) => {
+      switch (event.request.destination) {
+        case 'document':
+        return caches.match(FALLBACK_HTML_URL);
+      break;
+      default:
+        return Response.error();
+  }
+});
+
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches
+      .keys()
+      .then(keys => keys.filter(key => !key.endsWith(version)))
+      .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+  );
+});
+
+}
+else {
+    console.log('Boo! Workbox didnt load ');
+}
