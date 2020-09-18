@@ -44,5 +44,8 @@
     "sizes": "512x512",
     "type": "image/png",
     "density": "5.0"
-  }]
+  }],
+  "serviceworker": {
+    "src": "./sw.js"
+  }
 }
